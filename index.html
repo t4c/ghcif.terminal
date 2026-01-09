@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>ghcif.de - long time no c</title>
+    <link rel="stylesheet" href="css/terminal.css">
+</head>
+<body onclick="document.getElementById('in').focus()">
+
+<div id="window">
+    <div id="title-bar"><span>/bin/zsh - tty1 ghcif.de terminal [80x24]</span><span>[X]</span></div>
+    <div id="term-body">
+        <div class="out boot-log">[    0.000000] Linux version 6.8.9-ghcif-amd64 (t4c@buildsrv) #1 SMP PREEMPT_DYNAMIC</div>
+        <div class="out boot-log">[    0.002134] Command line: BOOT_IMAGE=/boot/vmlinuz root=UUID=fnord-1337 ro quiet</div>
+        <div class="out boot-log">[    0.145020] x86/cpu: VMX (outside TXT) disabled by BIOS</div>
+        <div class="out boot-log">[    0.567000] printk: console [tty0] enabled</div>
+        <div class="out boot-log">[    1.002000] Mounting local filesystems...</div>
+        <div class="out boot-log">[    1.045000] [sda1] Filesystem is clean, but contains errors</div>
+        <div class="out boot-log">[    1.200000] Run /init as init process</div>
+        <div class="out boot-log">[    1.800000] Starting Network Service... [OK]</div>
+        <div class="out boot-log">[    2.100000] Starting SSH Daemon... [OK]</div>
+        <br>
+        <div class="out style-guest">Welcome to GHCIF OS (GNU/Linux 6.8.9-ghcif x86_64)</div>
+        <div class="out style-guest">System load: 0.01, 0.05, 0.00</div>
+        <br>
+        <div class="out std-white" id="last-login"></div>
+        <div class="out std-white">Type 'help' for commands.</div>
+        
+        <div id="history"></div>
+        <div class="cmd-line">
+            <span id="p-span" class="prompt style-guest">guest@ghcif:~$</span>
+            <input type="text" id="in" autocomplete="off" autofocus>
+        </div>
+    </div>
+</div>
+
+<script src="terminal.js"></script>
+</body>
+</html>
