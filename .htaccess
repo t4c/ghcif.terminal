@@ -1,0 +1,4 @@
+<Files "cmd_history.log">
+    # Verhindert den Zugriff für alle Web-Besucher
+    Require all denied
+</Files>
