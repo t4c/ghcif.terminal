@@ -322,6 +322,55 @@ const cmds = {
          if ((arg === 'exploit.c' || arg === 'cv_modern.py') && user !== 't4c') return 'more: permission denied';
          return fs[arg] ? fs[arg] : `more: ${arg}: No such file or directory`;
     },
+    'sudo': () => {
+        if(user === 't4c') return 'root is allowed to do everything.';
+        return `${user} is not in the sudoers file. This incident will be reported.`;
+    },
+    'df': () => {
+        return `Filesystem     1K-blocks      Used Available Use% Mounted on
+udev             8106268         0   8106268   0% /dev
+tmpfs            1628048      1632   1626416   1% /run
+/dev/sda1      479151840  42138116 412602740  10% /
+tmpfs            8140232         0   8140232   0% /dev/shm
+tmpfs               5120         4      5116   1% /run/lock
+/dev/sda15        106858      6184    100674   6% /boot/efi
+tmpfs            1628044        72   1627972   1% /run/user/1000`;
+    },
+    'mount': () => {
+        return `sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=8106268k,nr_inodes=2026567,mode=755)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=1628048k,mode=755)
+/dev/sda1 on / type ext4 (rw,relatime,errors=remount-ro)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+/dev/sda15 on /boot/efi type vfat (rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro)`;
+    },
+    'du': () => {
+        let size = 0;
+        Object.values(fs).forEach(c => size += c.length);
+        return `${size}\t.`;
+    },
+    'ss': () => {
+        return `State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port   Process
+LISTEN   0        128              0.0.0.0:22             0.0.0.0:*
+LISTEN   0        4096             0.0.0.0:80             0.0.0.0:*
+LISTEN   0        4096             0.0.0.0:443            0.0.0.0:*
+ESTAB    0        0          192.168.1.100:22        203.0.113.42:51234`;
+    },
+    'netstat': () => {
+        return `Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 0.0.0.0:22              0.0.0.0:* LISTEN
+tcp        0      0 0.0.0.0:80              0.0.0.0:* LISTEN
+tcp        0      0 0.0.0.0:443             0.0.0.0:* LISTEN
+tcp        0      0 192.168.1.100:22        203.0.113.42:51234      ESTABLISHED`;
+    },
     'nmap': (arg) => {
         if (!arg) return 'Usage: nmap [target]';
         
@@ -421,7 +470,7 @@ Nmap done: 1 IP address (1 host up) scanned in ${duration} seconds`;
         }
         return `rm: cannot remove '${arg}': Permission denied`;
     },
-    'help': () => 'COMMANDS: ls, cat [file], more [file], history, nmap [target], lynx [url], clear, whoami, exit' + (user === 't4c' ? ', rm, gcc, python, ./exploit' : ''),
+    'help': () => 'COMMANDS: ls, cat [file], more [file], history, nmap [target], lynx [url], mount, df, du, ss, netstat, clear, whoami, exit' + (user === 't4c' ? ', rm, gcc, python, ./exploit' : ''),
     'clear': () => { histDiv.innerHTML = ''; return null; },
     'whoami': () => user,
     'history': () => {
