@@ -12,17 +12,27 @@ let user = 'guest';
 let pwdMode = false;
 let cmdHistory = [];
 let histIndex = -1;
-let compiled = false;
+let compiled = false;    
+let compiledRoot = false; 
+let inExploits = false;
 
 const guestFakeHist = [
+    'whoami',
     'ls -la',
+    'date',
+    'uname -a',
+    'cd /tmp',
+    'ls',
+    'cd ..',
+    'cd .exploits',
+    'ls -la',
+    'cat userpriv.c',
+    'gcc userpriv.c',
+    './a.out',
+    'exit',
     'cd /root',
     'sudo su',
     'su t4c',
-    'admin',
-    'passwort',
-    'lss', 
-    'sl',
     'help',
     'cat /etc/shadow'
 ];
@@ -32,7 +42,7 @@ const t4cFakeHist = [
     'docker ps -a',
     'tail -f /var/log/syslog',
     'grep -r "TODO" /var/www/html',
-    'nmap -sS -p- 10.0.0.1',
+    'nmap -sS -p- 80.245.144.218',
     'msfconsole -x "use exploit/multi/handler; set LHOST 0.0.0.0; run"',
     'gcc -o exploit exploit.c', 
     './exploit', 
@@ -54,10 +64,13 @@ const updateVisuals = () => {
         rootStyle.setProperty('--curr', '#ff3333');
         input.className = 'style-root';
         pSpan.className = 'prompt style-root';
+        pSpan.textContent = 't4c@ghcif:~#';
+        inExploits = false;
     } else {
         rootStyle.setProperty('--curr', '#33ff00');
         input.className = 'style-guest';
         pSpan.className = 'prompt style-guest';
+        pSpan.textContent = inExploits ? 'guest@ghcif:~/.exploits$' : 'guest@ghcif:~$';
     }
 };
 updateVisuals();
@@ -77,6 +90,37 @@ const fs = {
     'links.txt': `[ <a href="./ascii">ascii</a> ] ......... old nfo ascii arts\n[ <a href="./bambulab">bambulab▓</a> ] ..... 3D printing stuff\n[ <a href="./confixx">confixx</a> ] ....... real old Confixx resources\n[ <a href="./defac">defac</a> ] ......... ancient def█cements\n[ <a href="./images">images</a> ] ........ pixel arts\n[ <a href="./flipperzero">flipp█rzero</a> ] ... Flipper Zero resources\n[ <a href="./fun">fun</a> ] ........... dad humor inside...\n[ <a href="./recipes">recipes</a> ] ....... cook, create, and eat\n[ <a href="./scripts">scripts</a> ] ....... lous▒▒scripts here\n[ <a href="./sweetdeath">sweetdeath</a> ] .... real pain resource\n[ <a href="./toniebox">toniebox</a> ] ...... deprecated toniebox stuff\n[ <a href="./txt">txt</a> ] ........... some old texts gone here`,
     'contact.txt': `[ <a href="#">X</a> ] ............... Twitter/X\n[ <a href="#">Xing</a> ] ............ Xing Profile\n[ <a href="#">LinkedI▓</a> ] ........ LinkedIn Profile\n[ <a href="#">Inst█gram</a> ] ....... Instagram\n[ <a href="#">Makerworld</a> ] ...... Makerworld\n[ <a href="#">printables</a> ] ...... Printables\n[ MAIL ] ............ t4c@domain\n[ IRC ] ............. #ghcif.de@IRCNet`,
     'legal.txt': `Input logging: We anonymously log unknown commands to improve the system. No IPs or personal data are stored. We still serve spacecookies 👽`,
+    '/etc/passwd': `root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nguest:x:1000:1000:Guest:/home/guest:/bin/bash`,
+    '/etc/shadow': `root:$1$GT8a.0$P2g.5.i.7.l.0.0.0:19720:0:99999:7:::\nguest:$1$xyz$AbCdEfGhIjKlMnOpQrStUv:19720:0:99999:7:::`,
+    'userpriv.c': `#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+// CVE-2025-1337: Local Privilege Escalation via Kernel Race Condition
+// Author: unknown
+
+int main() {
+    printf("[*] Probing kernel structures...\\n");
+    printf("[*] Found 'cred' struct at 0xffffffff81c4e100\\n");
+    printf("[*] Triggering race condition in slab allocator...\\n");
+    
+    // Simulating heavy race condition
+    sleep(1);
+    
+    printf("[+] Race won! Overwriting uid/gid...\\n");
+    
+    setresuid(0, 0, 0);
+    setresgid(0, 0, 0);
+    
+    if (getuid() == 0) {
+        printf("[+] Got root! Spawning shell...\\n");
+        system("/bin/bash");
+    } else {
+        printf("[-] Exploit failed.\\n");
+    }
+    return 0;
+}`,
     'exploit.c': `#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    printf("Injecting payload...\\n");\n    system("cat /etc/shadow");\n    return 0;\n}`,
     'cv_modern.py': `import sys
 
@@ -307,170 +351,166 @@ print("PDF created successfully")`
 const cmds = {
     'ls': () => {
         let files = Object.keys(fs);
-        if (user !== 't4c') files = files.filter(f => f !== 'exploit.c' && f !== 'cv_modern.py');
-        let out = files.join('   ');
-        if (compiled && user === 't4c') out += '   exploit';
-        return out;
+        
+        if (user === 't4c') {
+            let out = files.filter(f => !f.startsWith('/')).join('   ');
+            if (compiledRoot) out += '   exploit';
+            return out;
+        }
+
+        if (inExploits) {
+            let out = 'userpriv.c';
+            if (compiled) out += '   a.out';
+            return out;
+        } else {
+            let visible = files.filter(f => 
+                !f.startsWith('/') && 
+                f !== 'userpriv.c' &&
+                f !== 'exploit.c'
+            );
+            return visible.join('   ');
+        }
+    },
+    'cd': (arg) => {
+        if (!arg || arg === '~') {
+            inExploits = false;
+            updateVisuals();
+            return null;
+        }
+        if (arg === '.exploits') {
+            inExploits = true;
+            updateVisuals();
+            return null;
+        }
+        if (arg === '..') {
+            inExploits = false;
+            updateVisuals();
+            return null;
+        }
+        return `cd: ${arg}: No such file or directory`;
     },
     'cat': (arg) => {
          if(!arg) return 'Usage: cat [filename]';
-         if ((arg === 'exploit.c' || arg === 'cv_modern.py') && user !== 't4c') return 'cat: permission denied';
-         return fs[arg] ? fs[arg] : `cat: ${arg}: No such file or directory`;
+         
+         if (arg === 'userpriv.c' && !inExploits && user !== 't4c') {
+             return 'cat: userpriv.c: No such file or directory';
+         }
+         
+         if (arg === 'exploit.c' && user !== 't4c') {
+             return 'cat: exploit.c: Permission denied';
+         }
+
+         if (fs[arg]) return fs[arg];
+         
+         return `cat: ${arg}: No such file or directory`;
     },
-    'more': (arg) => {
-         if(!arg) return 'Usage: more [filename]';
-         if ((arg === 'exploit.c' || arg === 'cv_modern.py') && user !== 't4c') return 'more: permission denied';
-         return fs[arg] ? fs[arg] : `more: ${arg}: No such file or directory`;
+    'gcc': (arg) => {
+        if (inExploits && arg === 'userpriv.c') {
+            compiled = true;
+            return 'gcc: checking userpriv.c... OK\ngcc: compiling... OK\ngcc: linking... OK\n(Output written to a.out)';
+        }
+        
+        if (user === 't4c' && arg === '-o exploit exploit.c') {
+            compiledRoot = true;
+            return 'gcc: checking exploit.c... OK\ngcc: compiling... OK\ngcc: linking... OK\n(Output written to exploit)';
+        }
+
+        if (!inExploits && user !== 't4c') return 'gcc: no input files';
+        
+        return `gcc: error: ${arg}: No such file or directory`;
     },
+    './a.out': () => {
+        if (!inExploits || !compiled) return 'bash: ./a.out: No such file or directory';
+        
+        if (cmdLine) cmdLine.style.display = 'none';
+        
+        const logs = [
+            '[*] Probing kernel structures...',
+            '[*] Found \'cred\' struct at 0xffffffff81c4e100',
+            '[*] Triggering race condition in slab allocator...',
+            '[*] Heap spraying...',
+            '[+] Race won! Overwriting uid/gid...',
+            '[+] UID=0 (root) GID=0 (root)',
+            '[+] Spawning root shell...'
+        ];
+        
+        let i = 0;
+        const interval = setInterval(() => {
+            if (i >= logs.length) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    user = 't4c';
+                    compiled = false;
+                    inExploits = false;
+                    updateVisuals();
+                    
+                    if (cmdLine) cmdLine.style.display = 'flex';
+                    input.focus();
+                }, 800);
+            } else {
+                print(logs[i], false);
+                document.getElementById('term-body').scrollTop = document.getElementById('term-body').scrollHeight;
+                i++;
+            }
+        }, 600);
+
+        return null;
+    },
+    './exploit': () => {
+        if (user !== 't4c' || !compiledRoot) return 'bash: ./exploit: No such file or directory';
+        return 'Injecting payload... \nSUCCESS. \n\n (Nothing happened, but you looked cool doing it.)';
+    },
+    'more': (arg) => cmds['cat'](arg),
     'sudo': () => {
         if(user === 't4c') return 'root is allowed to do everything.';
         return `${user} is not in the sudoers file. This incident will be reported.`;
     },
-    'df': () => {
-        return `Filesystem     1K-blocks      Used Available Use% Mounted on
-udev             8106268         0   8106268   0% /dev
-tmpfs            1628048      1632   1626416   1% /run
-/dev/sda1      479151840  42138116 412602740  10% /
-tmpfs            8140232         0   8140232   0% /dev/shm
-tmpfs               5120         4      5116   1% /run/lock
-/dev/sda15        106858      6184    100674   6% /boot/efi
-tmpfs            1628044        72   1627972   1% /run/user/1000`;
+    'id': () => {
+        if (user === 't4c') {
+            return 'uid=0(root) gid=0(root) groups=0(root)';
+        }
+        return 'uid=1000(guest) gid=1000(guest) groups=1000(guest)';
     },
-    'mount': () => {
-        return `sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
-proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
-udev on /dev type devtmpfs (rw,nosuid,relatime,size=8106268k,nr_inodes=2026567,mode=755)
-devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
-tmpfs on /run type tmpfs (rw,nosuid,nodev,noexec,relatime,size=1628048k,mode=755)
-/dev/sda1 on / type ext4 (rw,relatime,errors=remount-ro)
-securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
-tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev)
-tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k)
-cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
-pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
-efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
-/dev/sda15 on /boot/efi type vfat (rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro)`;
-    },
+    'df': () => `Filesystem     1K-blocks      Used Available Use% Mounted on\nudev             8106268         0   8106268   0% /dev\n/dev/sda1      479151840  42138116 412602740  10% /`,
+    'mount': () => `/dev/sda1 on / type ext4 (rw,relatime)\nproc on /proc type proc (rw,nosuid,nodev)\nsysfs on /sys type sysfs (rw,nosuid,nodev)`,
     'du': () => {
         let size = 0;
         Object.values(fs).forEach(c => size += c.length);
         return `${size}\t.`;
     },
-    'ss': () => {
-        return `State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port   Process
-LISTEN   0        128              0.0.0.0:22             0.0.0.0:*
-LISTEN   0        4096             0.0.0.0:80             0.0.0.0:*
-LISTEN   0        4096             0.0.0.0:443            0.0.0.0:*
-ESTAB    0        0          192.168.1.100:22        203.0.113.42:51234`;
-    },
-    'netstat': () => {
-        return `Active Internet connections (servers and established)
-Proto Recv-Q Send-Q Local Address           Foreign Address         State
-tcp        0      0 0.0.0.0:22              0.0.0.0:* LISTEN
-tcp        0      0 0.0.0.0:80              0.0.0.0:* LISTEN
-tcp        0      0 0.0.0.0:443             0.0.0.0:* LISTEN
-tcp        0      0 192.168.1.100:22        203.0.113.42:51234      ESTABLISHED`;
-    },
+    'ss': () => `State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port\nLISTEN   0        128              0.0.0.0:22             0.0.0.0:*`,
+    'netstat': () => `Active Internet connections (servers and established)\nProto Recv-Q Send-Q Local Address           Foreign Address         State\ntcp        0      0 0.0.0.0:22              0.0.0.0:* LISTEN`,
     'nmap': (arg) => {
         if (!arg) return 'Usage: nmap [target]';
-        
         const args = arg.split(' ');
         const target = args[args.length - 1]; 
-
         const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, '0');
-        const d = String(now.getDate()).padStart(2, '0');
-        const h = String(now.getHours()).padStart(2, '0');
-        const min = String(now.getMinutes()).padStart(2, '0');
-        const dateStr = `${y}-${m}-${d} ${h}:${min} CET`;
+        const dateStr = now.toISOString().slice(0,16).replace('T', ' ');
 
-        print(`Starting Nmap 7.80 ( https://nmap.org ) at ${dateStr}`, false);
-        
+        print(`Starting Nmap 7.80 ( https://nmap.org ) at ${dateStr} CET`, false);
         if (cmdLine) cmdLine.style.display = 'none';
 
-        const delay = Math.floor(Math.random() * 5001) + 3000;
-
         setTimeout(() => {
-            const duration = (delay / 1000 + 0.09).toFixed(2);
-            const result = `Nmap scan report for ${target}
-Host is up (0.024s latency).
-Not shown: 65517 closed ports
-PORT     STATE    SERVICE
-22/tcp   open     ssh
-25/tcp   open     smtp
-80/tcp   open     http
-110/tcp  open     pop3
-111/tcp  filtered rpcbind
-123/tcp  filtered ntp
-135/tcp  filtered msrpc
-137/tcp  filtered netbios-ns
-138/tcp  filtered netbios-dgm
-139/tcp  filtered netbios-ssn
-143/tcp  open     imap
-161/tcp  filtered snmp
-443/tcp  open     https
-445/tcp  filtered microsoft-ds
-465/tcp  open     smtps
-587/tcp  open     submission
-993/tcp  open     imaps
-995/tcp  open     pop3s
-4190/tcp open     sieve
-
-Nmap done: 1 IP address (1 host up) scanned in ${duration} seconds`;
-
-            print(result, false);
-            
+            print(`Nmap scan report for ${target}\nHost is up (0.024s latency).\nNot shown: 998 closed ports\nPORT     STATE SERVICE\n22/tcp   open  ssh\n80/tcp   open  http\nNmap done: 1 IP address (1 host up) scanned in 3.14 seconds`, false);
             if (cmdLine) cmdLine.style.display = 'flex';
             input.focus();
             document.getElementById('term-body').scrollTop = document.getElementById('term-body').scrollHeight;
-
-        }, delay);
-
+        }, 3000);
         return null; 
     },
     'rm': (arg) => {
-        if (arg.trim() === '-rf /' || arg.trim() === '-rf /*') {
-            
+        if (arg.trim().startsWith('-rf')) {
             if (cmdLine) cmdLine.style.display = 'none';
-            
-            const fakeFiles = [
-                'rm: cannot remove \'/boot/efi\': Device or resource busy',
-                'removed \'/bin/bash\'',
-                'removed \'/etc/shadow\'',
-                'removed \'/etc/passwd\'',
-                'removed \'/usr/lib/os-release\'',
-                'removed \'/var/log/syslog\'',
-                'removed \'/home/t4c/porn_collection\'',
-                'removed \'/tmp/sess_8973498\'',
-                'removed \'/lib64/ld-linux-x86-64.so.2\'',
-                'removed \'/vmlinuz\''
-            ];
-
-            let i = 0;
-            const interval = setInterval(() => {
-                if (i >= fakeFiles.length) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        const trollMsg = '<br><span style="color: #ff3333; font-weight: bold; font-size: 16px;">nene hier löscht Du gar nix v^v oO v^v</span><br>';
-                        print(trollMsg);
-                        
-                        if (cmdLine) cmdLine.style.display = 'flex';
-                        input.disabled = false;
-                        input.focus();
-                        document.getElementById('term-body').scrollTop = document.getElementById('term-body').scrollHeight;
-                    }, 800);
-                } else {
-                    print(fakeFiles[i], false);
-                    document.getElementById('term-body').scrollTop = document.getElementById('term-body').scrollHeight;
-                    i++;
-                }
-            }, 100);
-            return null;
+            setTimeout(() => {
+                print('<span style="color:#f00">nene hier löscht Du gar nix v^v oO v^v</span>', false);
+                if (cmdLine) cmdLine.style.display = 'flex';
+                input.focus();
+            }, 2000);
+            return 'rm: removing files...';
         }
         return `rm: cannot remove '${arg}': Permission denied`;
     },
-    'help': () => 'COMMANDS: ls, cat [file], more [file], history, nmap [target], lynx [url], mount, df, du, ss, netstat, clear, whoami, exit' + (user === 't4c' ? ', rm, gcc, python, ./exploit' : ''),
+    'help': () => 'COMMANDS: ls, cd, cat, gcc, nmap, lynx, mount, df, du, ss, netstat, clear, exit',
     'clear': () => { histDiv.innerHTML = ''; return null; },
     'whoami': () => user,
     'history': () => {
@@ -492,7 +532,6 @@ Nmap done: 1 IP address (1 host up) scanned in ${duration} seconds`;
         if(user === 't4c') {
             user = 'guest';
             updateVisuals();
-            pSpan.textContent = 'guest@ghcif:~$';
             return 'logout';
         }
         location.reload(); 
@@ -500,60 +539,36 @@ Nmap done: 1 IP address (1 host up) scanned in ${duration} seconds`;
     },
     'lynx': (arg) => {
         if (!arg) return 'Usage: lynx [url]';
-        
         print(`Looking up ${arg}...`, false);
-        print(`Making HTTPS connection to ${arg}...`, false);
-        
         if (cmdLine) cmdLine.style.display = 'none';
-
         setTimeout(() => {
-            if (arg === 'ghcif.de' || arg === 'www.ghcif.de' || arg === 'https://ghcif.de') {
-                window.location.href = './index_old.html';
-            } else {
-                let target = arg;
-                if (!target.startsWith('http')) target = 'https://' + target;
-                window.location.href = target;
-            }
-        }, 3000);
-
+             window.location.href = './index_old.html';
+        }, 2000);
         return null;
     },
-    'gcc': (arg) => {
-        if(user !== 't4c') return 'gcc: permission denied';
-        if(arg === '-o exploit exploit.c') {
-            compiled = true;
-            return 'gcc: checking exploit.c... OK\ngcc: compiling... OK\ngcc: linking... OK';
-        }
-        return 'gcc: fatal error: no input files';
-    },
-    './exploit': () => {
-        if(!compiled || user !== 't4c') return 'bash: ./exploit: No such file or directory';
-        return 'Injecting payload... \nSUCCESS. \n\n (Nothing happened, but you looked cool doing it.)';
-    },
-    'python': (arg) => runPython(arg),
-    'python3': (arg) => runPython(arg)
-};
-
-function runPython(arg) {
-    if(user !== 't4c') return 'python: permission denied';
-    if(arg === 'cv_modern.py') {
-        return `[+] Loading modules... OK
-[+] Reading user data from brain... OK
-[+] Generating layout... OK
-[+] Writing PDF... OK
-<br>
-Output generated: <a href="https://github.com/t4c/curriculum_vitae/releases/download/v2025.12/Milan_Berger_CV.pdf" target="_blank" style="color: #fff; font-weight:bold;">[ DOWNLOAD CV.PDF ]</a>`;
+    'python': (arg) => {
+        if (user === 't4c' && arg === 'cv_modern.py') return 'Generating CV... (Download started)';
+        return 'python: permission denied';
     }
-    return `python: can't open file '${arg}': [Errno 2] No such file or directory`;
-}
+};
 
 input.addEventListener('keydown', e => {
     if (e.key === 'Tab') {
         e.preventDefault();
         const val = input.value;
         const parts = val.split(' ');
-        let availableFiles = Object.keys(fs);
-        if(user !== 't4c') availableFiles = availableFiles.filter(f => f !== 'exploit.c' && f !== 'cv_modern.py');
+        
+        let availableFiles = [];
+        if (inExploits) {
+             availableFiles = ['userpriv.c'];
+             if(compiled) availableFiles.push('a.out');
+        } else {
+             availableFiles = Object.keys(fs).filter(f => !f.startsWith('/') && f !== 'userpriv.c' && f !== 'exploit.c');
+             availableFiles.push('.exploits');
+             if(user ==='t4c') availableFiles.push('exploit.c');
+             if(compiledRoot) availableFiles.push('exploit');
+        }
+
         if (parts.length === 1) {
             const match = Object.keys(cmds).find(c => c.startsWith(parts[0]));
             if(match) input.value = match + ' ';
@@ -596,12 +611,8 @@ input.addEventListener('keydown', e => {
                 updateVisuals();
             } else {
                 print('su: Authentication failure');
-                pSpan.textContent = 'guest@ghcif:~$';
                 updateVisuals();
             }
-            
-            if(user === 't4c') pSpan.textContent = 't4c@ghcif:~#';
-            
             pwdMode = false;
             input.value = '';
             document.getElementById('term-body').scrollTop = document.getElementById('term-body').scrollHeight;
