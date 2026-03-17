@@ -88,7 +88,7 @@ const fs = {
     'skills.txt': `OS: Linux (Gentoo, Debian, Ub▓ntu, RHEL, SLES)\noperating: Humans, Dogs, DBs, Mailserver, Containe▌\nbul▒shitbingo: k8s, docker, Postgre, Mari█DB, Cassandra, ITSec, Infosec, ITIL\ncerts: CEH, ECSA, ITILv4`,
     'non_work.txt': `my son and dog, training bjj, gaming (from Gran▓Tourismo over God of War to Mortal Kombat), low level soldering, 3d printing, urban farming, reading, happy kinkster`,
     'links.txt': `[ <a href="./ascii">ascii</a> ] ......... old nfo ascii arts\n[ <a href="./bambulab">bambulab▓</a> ] ..... 3D printing stuff\n[ <a href="./confixx">confixx</a> ] ....... real old Confixx resources\n[ <a href="./defac">defac</a> ] ......... ancient def█cements\n[ <a href="./images">images</a> ] ........ pixel arts\n[ <a href="./flipperzero">flipp█rzero</a> ] ... Flipper Zero resources\n[ <a href="./fun">fun</a> ] ........... dad humor inside...\n[ <a href="./recipes">recipes</a> ] ....... cook, create, and eat\n[ <a href="./scripts">scripts</a> ] ....... lous▒▒scripts here\n[ <a href="./sweetdeath">sweetdeath</a> ] .... real pain resource\n[ <a href="./toniebox">toniebox</a> ] ...... deprecated toniebox stuff\n[ <a href="./txt">txt</a> ] ........... some old texts gone here`,
-    'contact.txt': `[ <a href="#">X</a> ] ............... Twitter/X\n[ <a href="#">Xing</a> ] ............ Xing Profile\n[ <a href="#">LinkedI▓</a> ] ........ LinkedIn Profile\n[ <a href="#">Inst█gram</a> ] ....... Instagram\n[ <a href="#">Makerworld</a> ] ...... Makerworld\n[ <a href="#">printables</a> ] ...... Printables\n[ MAIL ] ............ t4c@domain\n[ IRC ] ............. #ghcif.de@IRCNet`,
+    'contact.txt': `[ <a href="https://x.com/twit4c" target="_blank">X</a> ] ............... Twitter/X\n[ <a href="https://www.xing.com/profile/Milan_Berger/" target="_blank">Xing</a> ] ............ Xing Profile\n[ <a href="https://www.linkedin.com/in/milan-berger/" target="_blank">LinkedI▓</a> ] ........ LinkedIn Profile\n[ <a href="https://www.instagram.com/t4c_23/" target="_blank">Inst█gram</a> ] ....... Instagram\n[ <a href="https://github.com/t4c/" target="_blank">Github</a> ] .......... Github Profile\n[ <a href="https://makerworld.com/de/@AinOwge" target="_blank">Makerworld</a> ] ...... Makerworld\n[ <a href="https://www.printables.com/@ainowge" target="_blank">printables</a> ] ...... Printables\n[ <a href="https://t.me/ghcif" target="_blank">Telegram</a> ] ........ Telegram\n[ MAIL ] ............ t4c@domain`,
     'legal.txt': `Input logging: We anonymously log unknown commands to improve the system. No IPs or personal data are stored. We still serve spacecookies 👽`,
     '/etc/passwd': `root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nguest:x:1000:1000:Guest:/home/guest:/bin/bash`,
     '/etc/shadow': `root:$1$GT8a.0$P2g.5.i.7.l.0.0.0:19720:0:99999:7:::\nguest:$1$xyz$AbCdEfGhIjKlMnOpQrStUv:19720:0:99999:7:::`,
@@ -565,7 +565,7 @@ input.addEventListener('keydown', e => {
         } else {
              availableFiles = Object.keys(fs).filter(f => !f.startsWith('/') && f !== 'userpriv.c' && f !== 'exploit.c');
              availableFiles.push('.exploits');
-             if(user ==='t4c') availableFiles.push('exploit.c');
+             if(user === 't4c') availableFiles.push('exploit.c');
              if(compiledRoot) availableFiles.push('exploit');
         }
 
