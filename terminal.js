@@ -4,6 +4,12 @@ const pSpan = document.getElementById('p-span');
 const cmdLine = document.querySelector('.cmd-line');
 const rootStyle = document.documentElement.style;
 
+function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 input.disabled = false;
 if (cmdLine) cmdLine.style.display = 'flex';
 input.focus();
@@ -88,264 +94,13 @@ const fs = {
     'skills.txt': `OS: Linux (Gentoo, Debian, Ub▓ntu, RHEL, SLES)\noperating: Humans, Dogs, DBs, Mailserver, Containe▌\nbul▒shitbingo: k8s, docker, Postgre, Mari█DB, Cassandra, ITSec, Infosec, ITIL\ncerts: CEH, ECSA, ITILv4`,
     'non_work.txt': `my son and dog, training bjj, gaming (from Gran▓Tourismo over God of War to Mortal Kombat), low level soldering, 3d printing, urban farming, reading, happy kinkster`,
     'links.txt': `[ <a href="./ascii">ascii</a> ] ......... old nfo ascii arts\n[ <a href="./bambulab">bambulab▓</a> ] ..... 3D printing stuff\n[ <a href="./confixx">confixx</a> ] ....... real old Confixx resources\n[ <a href="./defac">defac</a> ] ......... ancient def█cements\n[ <a href="./images">images</a> ] ........ pixel arts\n[ <a href="./flipperzero">flipp█rzero</a> ] ... Flipper Zero resources\n[ <a href="./fun">fun</a> ] ........... dad humor inside...\n[ <a href="./recipes">recipes</a> ] ....... cook, create, and eat\n[ <a href="./scripts">scripts</a> ] ....... lous▒▒scripts here\n[ <a href="./sweetdeath">sweetdeath</a> ] .... real pain resource\n[ <a href="./toniebox">toniebox</a> ] ...... deprecated toniebox stuff\n[ <a href="./txt">txt</a> ] ........... some old texts gone here`,
-    'contact.txt': `[ <a href="https://x.com/twit4c" target="_blank">X</a> ] ............... Twitter/X\n[ <a href="https://www.xing.com/profile/Milan_Berger/" target="_blank">Xing</a> ] ............ Xing Profile\n[ <a href="https://www.linkedin.com/in/milan-berger/" target="_blank">LinkedI▓</a> ] ........ LinkedIn Profile\n[ <a href="https://www.instagram.com/t4c_23/" target="_blank">Inst█gram</a> ] ....... Instagram\n[ <a href="https://github.com/t4c/" target="_blank">Github</a> ] .......... Github Profile\n[ <a href="https://makerworld.com/de/@AinOwge" target="_blank">Makerworld</a> ] ...... Makerworld\n[ <a href="https://www.printables.com/@ainowge" target="_blank">printables</a> ] ...... Printables\n[ <a href="https://t.me/ghcif" target="_blank">Telegram</a> ] ........ Telegram\n[ MAIL ] ............ t4c@domain`,
+    'contact.txt': `[ <a href="https://x.com/twit4c" target="_blank">X</a> ] ............... Twitter/X\n[ <a href="https://www.xing.com/profile/Milan_Berger/" target="_blank">Xing</a> ] ............ Xing Profile\n[ <a href="https://www.linkedin.com/in/milan-berger/" target="_blank">LinkedI▓</a> ] ........ LinkedIn Profile\n[ <a href="https://www.instagram.com/t4c_23/" target="_blank">Inst█gram</a> ] ....... Instagram\n[ <a href="https://github.com/t4c/" target="_blank">Github</a> ] .......... Github Profile\n[ <a href="https://makerworld.com/de/@AinOwge" target="_blank">Makerworld</a> ] ...... Makerworld\n[ <a href="https://www.printables.com/@ainowge" target="_blank">printables</a> ] ...... Printables\n[ <a href="https://t.me/ghcif" target="_blank">Telegram</a> ] ........ Telegram Gruppe\n[ MAIL ] ............ t4c@domain`,
     'legal.txt': `Input logging: We anonymously log unknown commands to improve the system. No IPs or personal data are stored. We still serve spacecookies 👽`,
     '/etc/passwd': `root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nguest:x:1000:1000:Guest:/home/guest:/bin/bash`,
     '/etc/shadow': `root:$1$GT8a.0$P2g.5.i.7.l.0.0.0:19720:0:99999:7:::\nguest:$1$xyz$AbCdEfGhIjKlMnOpQrStUv:19720:0:99999:7:::`,
-    'userpriv.c': `#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-
-// CVE-2025-1337: Local Privilege Escalation via Kernel Race Condition
-// Author: unknown
-
-int main() {
-    printf("[*] Probing kernel structures...\\n");
-    printf("[*] Found 'cred' struct at 0xffffffff81c4e100\\n");
-    printf("[*] Triggering race condition in slab allocator...\\n");
-    
-    // Simulating heavy race condition
-    sleep(1);
-    
-    printf("[+] Race won! Overwriting uid/gid...\\n");
-    
-    setresuid(0, 0, 0);
-    setresgid(0, 0, 0);
-    
-    if (getuid() == 0) {
-        printf("[+] Got root! Spawning shell...\\n");
-        system("/bin/bash");
-    } else {
-        printf("[-] Exploit failed.\\n");
-    }
-    return 0;
-}`,
+    'userpriv.c': `#include <stdio.h>\n#include <stdlib.h>\n#include <unistd.h>\n#include <sys/types.h>\n\nint main() {\n    printf("[*] Probing kernel structures...\\n");\n    printf("[*] Found 'cred' struct at 0xffffffff81c4e100\\n");\n    printf("[*] Triggering race condition in slab allocator...\\n");\n    \n    sleep(1);\n    \n    printf("[+] Race won! Overwriting uid/gid...\\n");\n    \n    setresuid(0, 0, 0);\n    setresgid(0, 0, 0);\n    \n    if (getuid() == 0) {\n        printf("[+] Got root! Spawning shell...\\n");\n        system("/bin/bash");\n    } else {\n        printf("[-] Exploit failed.\\n");\n    }\n    return 0;\n}`,
     'exploit.c': `#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    printf("Injecting payload...\\n");\n    system("cat /etc/shadow");\n    return 0;\n}`,
-    'cv_modern.py': `import sys
-
-try:
-    from fpdf import FPDF
-except ImportError:
-    print("\\n---------------------------------------------------------")
-    print("ERROR: The module 'fpdf' is missing.")
-    print("Please install it using the following command in your terminal:")
-    print("pip install fpdf")
-    print("---------------------------------------------------------\\n")
-    sys.exit(1)
-
-class WenzkeCV(FPDF):
-    def header(self):
-        self.set_fill_color(60, 60, 60)
-        self.rect(0, 0, 70, 297, 'F')
-
-        if self.page_no() == 1:
-            self.set_xy(75, 20)
-            self.set_font('Helvetica', 'B', 24)
-            self.set_text_color(0)
-            self.cell(0, 10, 'MILAN BERGER', border=0, align='L', new_x="LMARGIN", new_y="NEXT")
-            self.set_xy(75, 30)
-            self.set_font('Helvetica', '', 12)
-            self.set_text_color(100)
-            self.cell(0, 8, 'Principal Solution Architect', border=0, align='L', new_x="LMARGIN", new_y="NEXT")
-
-    def footer(self):
-        self.set_y(-15)
-        self.set_x(70)
-        self.set_font('Helvetica', '', 8)
-        self.set_text_color(150)
-        self.cell(0, 10, f'Seite {self.page_no()}', border=0, align='R', new_x="RIGHT", new_y="TOP")
-
-    def draw_sidebar_content(self, certs, languages):
-        self.set_y(50)
-        self.set_left_margin(5)
-        self.set_right_margin(145)
-        self.set_text_color(255, 255, 255)
-
-        # CONTACT
-        self.set_font('Helvetica', 'B', 11)
-        self.set_x(5)
-        self.cell(60, 8, "KONTAKT", border=0, align='L', new_x="LMARGIN", new_y="NEXT")    
-        self.set_font('Helvetica', '', 9)
-        self.set_x(5)
-        self.multi_cell(60, 5, "Bunzlauer Straße 61\\n90473 Nürnberg", align='L')
-        self.ln(8)
-
-        # lang
-        self.set_font('Helvetica', 'B', 11)
-        self.set_x(5)
-        self.cell(60, 8, "SPRACHEN", border=0, align='L', new_x="LMARGIN", new_y="NEXT")
-        self.set_font('Helvetica', '', 9)
-        for lang in languages:
-            self.set_x(5)
-            self.cell(60, 5, lang, border=0, align='L', new_x="LMARGIN", new_y="NEXT")
-        self.ln(8)
-
-        # certs
-        self.set_font('Helvetica', 'B', 11)
-        self.set_x(5)
-        self.cell(60, 8, "ZERTIFIKATE", border=0, align='L', new_x="LMARGIN", new_y="NEXT")
-        self.set_font('Helvetica', '', 8)
-        for cert in certs:
-            self.set_x(5)
-            self.multi_cell(60, 4, f"- {cert}", align='L')
-            self.ln(1)
-        self.ln(5)
-
-    def section_title(self, title):
-        self.ln(5)
-        self.set_x(75)
-        self.set_font('Helvetica', 'B', 12)
-        self.set_text_color(30, 30, 30)
-        self.cell(0, 8, title.upper(), border=0, align='L', new_x="LMARGIN", new_y="NEXT")
-        self.set_draw_color(200)
-        self.line(75, self.get_y(), 200, self.get_y())
-        self.ln(5)
-
-    def job_entry(self, date, company, role, details):
-        self.set_x(75)
-        self.set_font('Helvetica', 'B', 10)
-        self.set_text_color(0)
-        self.cell(35, 5, date, border=0, align='L', new_x="RIGHT", new_y="TOP")
-
-        # Company
-        self.set_font('Helvetica', 'B', 11)
-        self.cell(0, 5, company, border=0, align='L', new_x="LMARGIN", new_y="NEXT")
-
-        # Role
-        self.set_x(110)
-        self.set_font('Helvetica', 'I', 10)
-        self.set_text_color(50)
-        self.cell(0, 5, role, border=0, align='L', new_x="LMARGIN", new_y="NEXT")
-
-        # Details
-        self.ln(2)
-        self.set_font('Helvetica', '', 10)
-        self.set_text_color(30)
-        for line in details:
-            self.set_x(110)
-            self.multi_cell(0, 5, f"- {line}", align='L')
-        self.ln(4)
-
-    def skill_block(self, category, items):
-        self.set_x(75)
-        self.set_font('Helvetica', 'B', 10)
-        self.set_text_color(0)
-        self.cell(40, 5, category + ":", border=0, align='L', new_x="RIGHT", new_y="TOP")
-        self.set_font('Helvetica', '', 10)
-        self.set_text_color(50)
-        self.multi_cell(0, 5, items, align='L')
-        self.ln(1)
-
-certs_list = [
-    "LPT (Licensed Penetration Tester)",
-    "CEH (Certified Ethical Hacker)",
-    "ECSA (Security Analyst)",
-    "ITIL Foundation v4",
-    "Splunk Certified User",
-    "Ausbildereignung (IHK)"
-]
-
-langs_list = [
-    "Deutsch (Muttersprache)",
-    "Englisch (Verhandlungssicher)"
-]
-
-summary = (
-    "Erfahrener Technical Lead und Solution Architect. Kombination aus tiefer technischer "
-    "Expertise (Linux, K8s, Security) und C-Level Management-Erfahrung. "
-    "Fokus auf Managed Services und Prozessdigitalisierung."
-)
-
-pdf = WenzkeCV()
-pdf.set_auto_page_break(auto=True, margin=15)
-
-pdf.add_page()
-pdf.draw_sidebar_content(certs_list, langs_list)
-
-pdf.set_left_margin(75)
-pdf.set_right_margin(10)
-pdf.set_y(45)
-
-pdf.set_font('Helvetica', '', 10)
-pdf.set_text_color(50)
-pdf.multi_cell(0, 5, summary, align='L')
-pdf.ln(5)
-
-# experience
-pdf.section_title("Berufserfahrung")
-
-# Adesso
-pdf.job_entry("04.2024 - heute", "Adesso as a service GmbH", "Principal Solution Architect & Teamlead", [
-    "Technical Lead Managed Service Infrastrukturen",
-    "Fachliche Führung & Architekturverantwortung",
-    "Tech Stack: Linux, K8s, Docker, DBs"
-])
-
-# Pharmastore
-pdf.job_entry("04.2021 - heute", "Pharmastore GmbH", "Stellvertretender Geschäftsführer", [
-    "Gesamtverantwortung IT-Modernisierung & Digitalisierung",
-    "Einführung Topix ERP, Shopware, Zeiterfassung",
-    "Operative Teamführung & Prozessoptimierung"
-])
-
-# SVA
-pdf.job_entry("01.2018 - 03.2024", "System Vertrieb Alexander", "Big Data / Linux Systems Engineer", [
-    "Betrieb heterogener Linux- & Hadoop-Cluster",
-    "Aufbau Datamesh & Docker-Umgebungen",
-    "Consulting & Koordination"
-])
-
-# Diehl
-pdf.job_entry("08.2015 - 12.2017", "Diehl Connectivity Solutions", "Linux Systems Engineer", [
-    "Aufbau B2B 3rd Level Customer Support",
-    "Planung Cloud Backend & CERT Mitgliedschaft"
-])
-
-# Nureg
-pdf.job_entry("01.2015 - 04.2015", "Nureg AG", "Linux Systems Engineer", [
-    "Konfiguration Linux-Infrastruktur",
-    "Umsetzung Sicherheitsmaßnahmen"
-])
-
-# QSC
-pdf.job_entry("11.2006 - 12.2014", "QSC AG", "System Engineer / IT Security", [
-    "Full-Managed Support & Security Audits (ISO 27001)",
-    "Technische Ausbildung von Azubis"
-])
-
-# hard break to page 2
-pdf.add_page() 
-pdf.set_y(20) 
-
-# skills
-pdf.section_title("Fachkenntnisse & Stack")
-pdf.skill_block("Container", "Docker (Enterprise, Swarm), Ansible, Kubernetes basics")
-pdf.skill_block("OS", "Linux Expert (RHEL, SLES, Debian, Ubuntu), Unix")
-pdf.skill_block("Data/DB", "Cloudera, Kafka, MariaDB, Postgres, Splunk")
-pdf.skill_block("Security", "Nessus, OpenVAS, metasploit, rfid/nfc, ISO 27001")
-pdf.skill_block("Web/Tools", "Apache, Nginx, CheckMK, Nagios, Wireshark, Jira")
-
-# Selected Projects
-pdf.ln(5)
-pdf.section_title("Ausgewählte Projekte")
-pdf.job_entry("Laufend", "Managed Services (Adesso)", "Lead Architect", [
-    "Konzeption hochverfügbarer K8s-Umgebungen",
-    "Prozessoptimierung Datenanalyse"
-])
-
-pdf.job_entry("Laufend", "Digitalisierung (Pharmastore)", "Projektleitung", [
-    "Einführung Warenwirtschaft (Topix) & Webshop (Shopware)",
-    "Modernisierung Mailserver & Security"
-])
-
-pdf.job_entry("2022 - 2024", "Big Data Ops (Automotive)", "Ops Engineer", [
-    "Full Managed Service für Big Data Cluster",
-    "Tech: SuSE, Kafka, Trino, Minio, Spark"
-])
-
-pdf.output("Milan_Berger_CV.pdf")
-print("PDF created successfully")`
+    'cv_modern.py': `import sys\n\ntry:\n    from fpdf import FPDF\nexcept ImportError:\n    print("\\n---------------------------------------------------------")\n    print("ERROR: The module 'fpdf' is missing.")\n    print("Please install it using the following command in your terminal:")\n    print("pip install fpdf")\n    print("---------------------------------------------------------\\n")\n    sys.exit(1)\n\nclass WenzkeCV(FPDF):\n    def header(self):\n        self.set_fill_color(60, 60, 60)\n        self.rect(0, 0, 70, 297, 'F')\n\n        if self.page_no() == 1:\n            self.set_xy(75, 20)\n            self.set_font('Helvetica', 'B', 24)\n            self.set_text_color(0)\n            self.cell(0, 10, 'MILAN BERGER', border=0, align='L', new_x="LMARGIN", new_y="NEXT")\n            self.set_xy(75, 30)\n            self.set_font('Helvetica', '', 12)\n            self.set_text_color(100)\n            self.cell(0, 8, 'Principal Solution Architect', border=0, align='L', new_x="LMARGIN", new_y="NEXT")\n\n    def footer(self):\n        self.set_y(-15)\n        self.set_x(70)\n        self.set_font('Helvetica', '', 8)\n        self.set_text_color(150)\n        self.cell(0, 10, f'Seite {self.page_no()}', border=0, align='R', new_x="RIGHT", new_y="TOP")\n\n    def draw_sidebar_content(self, certs, languages):\n        self.set_y(50)\n        self.set_left_margin(5)\n        self.set_right_margin(145)\n        self.set_text_color(255, 255, 255)\n\n        self.set_font('Helvetica', 'B', 11)\n        self.set_x(5)\n        self.cell(60, 8, "KONTAKT", border=0, align='L', new_x="LMARGIN", new_y="NEXT")    \n        self.set_font('Helvetica', '', 9)\n        self.set_x(5)\n        self.multi_cell(60, 5, "Bunzlauer Straße 61\\n90473 Nürnberg", align='L')\n        self.ln(8)\n\n        self.set_font('Helvetica', 'B', 11)\n        self.set_x(5)\n        self.cell(60, 8, "SPRACHEN", border=0, align='L', new_x="LMARGIN", new_y="NEXT")\n        self.set_font('Helvetica', '', 9)\n        for lang in languages:\n            self.set_x(5)\n            self.cell(60, 5, lang, border=0, align='L', new_x="LMARGIN", new_y="NEXT")\n        self.ln(8)\n\n        self.set_font('Helvetica', 'B', 11)\n        self.set_x(5)\n        self.cell(60, 8, "ZERTIFIKATE", border=0, align='L', new_x="LMARGIN", new_y="NEXT")\n        self.set_font('Helvetica', '', 8)\n        for cert in certs:\n            self.set_x(5)\n            self.multi_cell(60, 4, f"- {cert}", align='L')\n            self.ln(1)\n        self.ln(5)\n\n    def section_title(self, title):\n        self.ln(5)\n        self.set_x(75)\n        self.set_font('Helvetica', 'B', 12)\n        self.set_text_color(30, 30, 30)\n        self.cell(0, 8, title.upper(), border=0, align='L', new_x="LMARGIN", new_y="NEXT")\n        self.set_draw_color(200)\n        self.line(75, self.get_y(), 200, self.get_y())\n        self.ln(5)\n\n    def job_entry(self, date, company, role, details):\n        self.set_x(75)\n        self.set_font('Helvetica', 'B', 10)\n        self.set_text_color(0)\n        self.cell(35, 5, date, border=0, align='L', new_x="RIGHT", new_y="TOP")\n\n        self.set_font('Helvetica', 'B', 11)\n        self.cell(0, 5, company, border=0, align='L', new_x="LMARGIN", new_y="NEXT")\n\n        self.set_x(110)\n        self.set_font('Helvetica', 'I', 10)\n        self.set_text_color(50)\n        self.cell(0, 5, role, border=0, align='L', new_x="LMARGIN", new_y="NEXT")\n\n        self.ln(2)\n        self.set_font('Helvetica', '', 10)\n        self.set_text_color(30)\n        for line in details:\n            self.set_x(110)\n            self.multi_cell(0, 5, f"- {line}", align='L')\n        self.ln(4)\n\n    def skill_block(self, category, items):\n        self.set_x(75)\n        self.set_font('Helvetica', 'B', 10)\n        self.set_text_color(0)\n        self.cell(40, 5, category + ":", border=0, align='L', new_x="RIGHT", new_y="TOP")\n        self.set_font('Helvetica', '', 10)\n        self.set_text_color(50)\n        self.multi_cell(0, 5, items, align='L')\n        self.ln(1)\n\ncerts_list = [\n    "LPT (Licensed Penetration Tester)",\n    "CEH (Certified Ethical Hacker)",\n    "ECSA (Security Analyst)",\n    "ITIL Foundation v4",\n    "Splunk Certified User",\n    "Ausbildereignung (IHK)"\n]\n\nlangs_list = [\n    "Deutsch (Muttersprache)",\n    "Englisch (Verhandlungssicher)"\n]\n\nsummary = (\n    "Erfahrener Technical Lead und Solution Architect. Kombination aus tiefer technischer "\n    "Expertise (Linux, K8s, Security) und C-Level Management-Erfahrung. "\n    "Fokus auf Managed Services und Prozessdigitalisierung."\n)\n\npdf = WenzkeCV()\npdf.set_auto_page_break(auto=True, margin=15)\n\npdf.add_page()\npdf.draw_sidebar_content(certs_list, langs_list)\n\npdf.set_left_margin(75)\npdf.set_right_margin(10)\npdf.set_y(45)\n\npdf.set_font('Helvetica', '', 10)\npdf.set_text_color(50)\npdf.multi_cell(0, 5, summary, align='L')\npdf.ln(5)\n\npdf.section_title("Berufserfahrung")\n\npdf.job_entry("04.2024 - heute", "Adesso as a service GmbH", "Principal Solution Architect & Teamlead", [\n    "Technical Lead Managed Service Infrastrukturen",\n    "Fachliche Führung & Architekturverantwortung",\n    "Tech Stack: Linux, K8s, Docker, DBs"\n])\n\npdf.job_entry("04.2021 - heute", "Pharmastore GmbH", "Stellvertretender Geschäftsführer", [\n    "Gesamtverantwortung IT-Modernisierung & Digitalisierung",\n    "Einführung Topix ERP, Shopware, Zeiterfassung",\n    "Operative Teamführung & Prozessoptimierung"\n])\n\npdf.job_entry("01.2018 - 03.2024", "System Vertrieb Alexander", "Big Data / Linux Systems Engineer", [\n    "Betrieb heterogener Linux- & Hadoop-Cluster",\n    "Aufbau Datamesh & Docker-Umgebungen",\n    "Consulting & Koordination"\n])\n\npdf.job_entry("08.2015 - 12.2017", "Diehl Connectivity Solutions", "Linux Systems Engineer", [\n    "Aufbau B2B 3rd Level Customer Support",\n    "Planung Cloud Backend & CERT Mitgliedschaft"\n])\n\npdf.job_entry("01.2015 - 04.2015", "Nureg AG", "Linux Systems Engineer", [\n    "Konfiguration Linux-Infrastruktur",\n    "Umsetzung Sicherheitsmaßnahmen"\n])\n\npdf.job_entry("11.2006 - 12.2014", "QSC AG", "System Engineer / IT Security", [\n    "Full-Managed Support & Security Audits (ISO 27001)",\n    "Technische Ausbildung von Azubis"\n])\n\npdf.add_page() \npdf.set_y(20) \n\npdf.section_title("Fachkenntnisse & Stack")\npdf.skill_block("Container", "Docker (Enterprise, Swarm), Ansible, Kubernetes basics")\npdf.skill_block("OS", "Linux Expert (RHEL, SLES, Debian, Ubuntu), Unix")\npdf.skill_block("Data/DB", "Cloudera, Kafka, MariaDB, Postgres, Splunk")\npdf.skill_block("Security", "Nessus, OpenVAS, metasploit, rfid/nfc, ISO 27001")\npdf.skill_block("Web/Tools", "Apache, Nginx, CheckMK, Nagios, Wireshark, Jira")\n\npdf.ln(5)\npdf.section_title("Ausgewählte Projekte")\npdf.job_entry("Laufend", "Managed Services (Adesso)", "Lead Architect", [\n    "Konzeption hochverfügbarer K8s-Umgebungen",\n    "Prozessoptimierung Datenanalyse"\n])\n\npdf.job_entry("Laufend", "Digitalisierung (Pharmastore)", "Projektleitung", [\n    "Einführung Warenwirtschaft (Topix) & Webshop (Shopware)",\n    "Modernisierung Mailserver & Security"\n])\n\npdf.job_entry("2022 - 2024", "Big Data Ops (Automotive)", "Ops Engineer", [\n    "Full Managed Service für Big Data Cluster",\n    "Tech: SuSE, Kafka, Trino, Minio, Spark"\n])\n\npdf.output("Milan_Berger_CV.pdf")\nprint("PDF created successfully")`
 };
 
 const cmds = {
@@ -400,7 +155,7 @@ const cmds = {
              return 'cat: exploit.c: Permission denied';
          }
 
-         if (fs[arg]) return fs[arg];
+         if (Object.prototype.hasOwnProperty.call(fs, arg)) return fs[arg];
          
          return `cat: ${arg}: No such file or directory`;
     },
@@ -539,7 +294,7 @@ const cmds = {
     },
     'lynx': (arg) => {
         if (!arg) return 'Usage: lynx [url]';
-        print(`Looking up ${arg}...`, false);
+        print(`Looking up ${escapeHTML(arg)}...`, false);
         if (cmdLine) cmdLine.style.display = 'none';
         setTimeout(() => {
              window.location.href = './index_old.html';
@@ -619,17 +374,34 @@ input.addEventListener('keydown', e => {
             return;
         }
 
+        if (/<script|onerror=|onload=|javascript:|iframe/i.test(val)) {
+            document.cookie = "easterhegg=Nice try - try again harder your cookiemonster; max-age=31536000; path=/";
+            
+            const alertMatch = val.match(/alert\(\s*(['"]?)(.*?)\1\s*\)/);
+            if (alertMatch) {
+                setTimeout(() => alert(alertMatch[2]), 100);
+            }
+
+            print(`${pSpan.textContent} ${escapeHTML(raw)}`, true);
+            print(`bash: ${escapeHTML(val.split(' ')[0])}: command not found`);
+            
+            input.value = '';
+            histIndex = -1;
+            document.getElementById('term-body').scrollTop = document.getElementById('term-body').scrollHeight;
+            return;
+        }
+
         if(val) cmdHistory.push(val);
         histIndex = -1;
         
-        print(`${pSpan.textContent} ${raw}`, true);
+        print(`${pSpan.textContent} ${escapeHTML(raw)}`, true);
 
         const [cmd, ...args] = val.split(' ');
-        if (cmds[cmd]) {
+        if (Object.prototype.hasOwnProperty.call(cmds, cmd)) {
             const res = cmds[cmd](args.join(' '));
             if (res) print(res);
         } else if (val !== '') {
-            print(`bash: ${cmd}: command not found`);
+            print(`bash: ${escapeHTML(cmd)}: command not found`);
             sendLog(val);
         }
         
