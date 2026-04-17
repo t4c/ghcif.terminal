@@ -55,6 +55,7 @@ Das Projekt benötigt lediglich einen Webserver mit **PHP-Support** (für das Lo
 * `whoami`: Zeigt aktuellen User.
 * `nmap [ip]`: Simuliert einen Portscan.
 * `lynx [url]`: Simuliert Verbindung und leitet weiter.
+* weitere Standardtools wie: more, id, history, clear...
 
 ### Root-Zugriff (Spoiler)
 Um Zugriff auf versteckte Dateien (`exploit.c`, `cv_modern.py`) zu erhalten:
@@ -74,6 +75,7 @@ Die gesamte Logik befindet sich in `terminal.js`.
 * **Dateisystem ändern:** Bearbeite das `fs` Objekt in `terminal.js`.
 * **Fake-History ändern:** Bearbeite die Arrays `guestFakeHist` und `t4cFakeHist`.
 * **Easter Eggs:** Suche nach der `rm` Funktion in `cmds`, um die Troll-Nachricht anzupassen.
+* **XSS Cookie:** Special Easterhegg für Raik, Cookie kann problemlos angepasst werden, Suche `document.cookie`
 
 ## 🛡️ Datenschutz (Logging)
 
